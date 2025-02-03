@@ -1,5 +1,6 @@
 package org.example.bibliotecaspringboot.Controlador;
 
+import jakarta.validation.Valid;
 import org.example.bibliotecaspringboot.Modelo.Prestamo;
 import org.example.bibliotecaspringboot.Modelo.PrestamoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,20 +40,26 @@ public class ControladorPrestamo {
     }
 
     @PostMapping("/agregarPrestamo")
-    public ResponseEntity<Prestamo> agregarPrestamo(@RequestBody Prestamo prestamo) {
+    public ResponseEntity<Prestamo> agregarPrestamo(@RequestBody @Valid Prestamo prestamo) {
         prestamoRepository.save(prestamo);
         return ResponseEntity.ok(prestamo);
     }
 
     @PutMapping("/modificarPrestamo")
-    public ResponseEntity<Prestamo> modificarPrestamo(@RequestBody Prestamo prestamo) {
+    public ResponseEntity<Prestamo> modificarPrestamo(@RequestBody @Valid Prestamo prestamo) {
         Prestamo prestamoModificado = prestamoRepository.save(prestamo);
         return ResponseEntity.ok(prestamoModificado);
     }
 
     @DeleteMapping("/eliminarPrestamo/{id}")
     public ResponseEntity<String> eliminarPrestamo(@PathVariable int id) {
-        prestamoRepository.deleteById(id);
-        return ResponseEntity.ok("El prestamo con id " +id+ " ha sido eliminado.");
+        if (prestamoRepository.existsById(id)){
+            prestamoRepository.deleteById(id);
+            return ResponseEntity.ok("El prestamo con id " +id+ " ha sido eliminado.");
+        }
+        else{
+            return ResponseEntity.ok("El prestamo no existe");
+        }
+
     }
 }

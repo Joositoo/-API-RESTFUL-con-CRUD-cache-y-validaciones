@@ -1,8 +1,12 @@
 package org.example.bibliotecaspringboot.Modelo;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -22,11 +26,14 @@ public class Ejemplar {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "isbn", nullable = false)
     @JsonBackReference("ejemplares")
+    @NotNull(message = "El isbn no puede ser nulo.")
     private Libro isbn;
 
     @ColumnDefault("'Disponible'")
     @Lob
     @Column(name = "estado")
+    @NotBlank(message = "El estado no puede ser nulo ni contener una cadena vacía.")
+    @Pattern(regexp = "^(Disponible|Prestado)$", message = "El estado debe ser 'Disponible' o 'Prestado'.")
     private String estado;
 
     @OneToMany(mappedBy = "ejemplar")

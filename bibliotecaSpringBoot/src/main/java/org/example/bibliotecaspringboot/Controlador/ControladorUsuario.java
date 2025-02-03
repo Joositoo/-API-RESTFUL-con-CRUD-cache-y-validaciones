@@ -1,10 +1,12 @@
 package org.example.bibliotecaspringboot.Controlador;
 
+import jakarta.validation.Valid;
 import org.example.bibliotecaspringboot.Modelo.Usuario;
 import org.example.bibliotecaspringboot.Modelo.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,20 +41,26 @@ public class ControladorUsuario {
     }
 
     @PostMapping("/agregarUsuario")
-    public ResponseEntity<Usuario> agregarUsuario(@RequestBody Usuario usuario){
+    public ResponseEntity<Usuario> agregarUsuario(@Valid @RequestBody Usuario usuario){
         usuarioRepository.save(usuario);
         return ResponseEntity.ok(usuario);
     }
 
     @PutMapping("/modificarUsuario")
-    public ResponseEntity<Usuario> modificarUsuario(@RequestBody Usuario usuario){
+    public ResponseEntity<?> modificarUsuario(@Valid@RequestBody Usuario usuario){
         Usuario usuarioModificado = usuarioRepository.save(usuario);
         return ResponseEntity.ok(usuarioModificado);
     }
 
     @DeleteMapping("eliminarUsuario/{id}")
     public ResponseEntity<String> eliminarUsuario(@PathVariable int id){
-        usuarioRepository.findById(id);
-        return ResponseEntity.ok("Usuario con id " +id+ " eliminado.");
+        if (usuarioRepository.existsById(id)){
+            usuarioRepository.deleteById(id);
+            return ResponseEntity.ok("Usuario con id " +id+ " eliminado.");
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Usuario con id: " + id + " no encontrado.");
+        }
     }
 }
